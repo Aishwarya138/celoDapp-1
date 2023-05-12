@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Button, Image, TextInput, View, StyleSheet,Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
-import Snackbar from 'react-native-snackbar';
-
+import { showMessage, hideMessage } from 'react-native-flash-message';
+import FlashMessage from 'react-native-flash-message';
 const Docs = () => {
   const [imageUri, setImageUri] = useState(null);
   const [customName, setCustomName] = useState('');
@@ -48,17 +48,24 @@ const Docs = () => {
       return;
     }
 
-    const asset = await MediaLibrary.createAssetAsync(imageUri, {filename: customName})
-
-    if (asset) {
-      try {
-        await MediaLibrary.createAlbumAsync('Expo', asset, false);
-        console.log('Image saved to gallery!');
-        Alert.alert('Success', 'Image successfully uploaded to gallery');
-      } catch (error) {
-        console.log('Error saving image to gallery:', error);
+    const asset = await MediaLibrary.createAssetAsync(imageUri, {filename: customName});
+  
+      if (asset) {
+        try {
+          await MediaLibrary.createAlbumAsync('Expo', asset, false);
+          console.log('Image saved to gallery!');
+          showMessage({
+            message: 'Image successfully uploaded to gallery',
+            type: 'success',
+          });
+        } catch (error) {
+          console.log('Error saving image to gallery:', error);
+          showMessage({
+            message: 'Error in uploading image to gallery',
+            type: 'danger',
+          });
+        }
       }
-    }
   };
 
   
@@ -84,6 +91,7 @@ const Docs = () => {
           disabled={!customName}
         />
       )}
+       <FlashMessage position="top" /> 
     </View>
   );
 };
