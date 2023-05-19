@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { Button, Image, TextInput, View, StyleSheet,Alert } from 'react-native';
+import { Button, Image, TextInput, View, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
-import { showMessage, hideMessage } from 'react-native-flash-message';
+import { showMessage } from 'react-native-flash-message';
 import FlashMessage from 'react-native-flash-message';
+import * as Sharing from 'expo-sharing';
+
 const Docs = () => {
   const [imageUri, setImageUri] = useState(null);
   const [customName, setCustomName] = useState('');
+  const [savedImagePath, setSavedImagePath] = useState('');
 
   const handleCameraPress = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -16,12 +19,12 @@ const Docs = () => {
     }
 
     const result = await ImagePicker.launchCameraAsync();
-    if (!result.cancelled) {
+    if (!result.canceled) {
       setImageUri(result.uri);
       promptForCustomName();
     }
   };
-
+ 
   const handleGalleryPress = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -30,8 +33,9 @@ const Docs = () => {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync();
-    if (!result.cancelled) {
+    if (!result.canceled) {
       setImageUri(result.uri);
+      // setSavedImagePath(result.uri);
       promptForCustomName();
     }
   };
@@ -67,8 +71,16 @@ const Docs = () => {
         }
       }
   };
-
   
+  const shareFile = async () => {
+    if (imageUri) {
+      await Sharing.shareAsync(imageUri);
+      console.log('Image shared successfully');
+    } else {
+      console.log('No image to share');
+    }
+  };  
+    
   return (
     <View style={styles.container}>
       <Button title="Take Picture" onPress={handleCameraPress} />
@@ -84,6 +96,7 @@ const Docs = () => {
           value={customName}
         />
       )}
+      <Button title="Share File" onPress={shareFile} />
       {imageUri && (
         <Button
           title="Save to Gallery"
