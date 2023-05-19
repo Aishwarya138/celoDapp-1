@@ -9,7 +9,6 @@ import * as Sharing from 'expo-sharing';
 const Docs = () => {
   const [imageUri, setImageUri] = useState(null);
   const [customName, setCustomName] = useState('');
-  const [savedImagePath, setSavedImagePath] = useState('');
 
   const handleCameraPress = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -35,7 +34,6 @@ const Docs = () => {
     const result = await ImagePicker.launchImageLibraryAsync();
     if (!result.canceled) {
       setImageUri(result.uri);
-      // setSavedImagePath(result.uri);
       promptForCustomName();
     }
   };
@@ -96,7 +94,7 @@ const Docs = () => {
           value={customName}
         />
       )}
-      <Button title="Share File" onPress={shareFile} />
+      {imageUri && <Button title="Share File" onPress={shareFile} />}
       {imageUri && (
         <Button
           title="Save to Gallery"
